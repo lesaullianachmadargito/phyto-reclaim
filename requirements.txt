@@ -1,0 +1,6 @@
+# Pinned loosely so Streamlit Community Cloud can resolve a working set.
+streamlit>=1.40
+numpy>=1.26
+numpy-financial>=1.0
+plotly>=5.20
+matplotlib>=3.8
