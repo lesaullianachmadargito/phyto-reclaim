@@ -1,0 +1,64 @@
+{
+  "aerial": {
+    "Access road, 4 m wide": {
+      "x": 1219.3,
+      "y": 522.1,
+      "visible": true
+    },
+    "Tier 1 - vertical flow, 345 m2\nvetiver + typha": {
+      "x": 1285.7,
+      "y": 639.4,
+      "visible": true
+    },
+    "Tier 2 - horizontal flow, 230 m2\nphragmites": {
+      "x": 1749.3,
+      "y": 470.4,
+      "visible": true
+    },
+    "Electrocoagulation reactor\n0.70 m3, Al-Fe electrodes": {
+      "x": 818.9,
+      "y": 1009.4,
+      "visible": true
+    },
+    "Reclaimed water tank\n38 m3/day to reuse": {
+      "x": 1008.9,
+      "y": 838.3,
+      "visible": true
+    },
+    "Adsorption polishing\n2 x 0.52 m3 bentonite-zeolite": {
+      "x": 721.8,
+      "y": 942.2,
+      "visible": true
+    },
+    "Flue-gas conditioning\n120-180 C cooled to ~30 C": {
+      "x": 899.1,
+      "y": 806.1,
+      "visible": true
+    },
+    "Tubular photobioreactor\n10 m3 working volume": {
+      "x": 691.9,
+      "y": 772.4,
+      "visible": true
+    },
+    "Decanter centrifuge\n0.5 m3/h": {
+      "x": 537.3,
+      "y": 839.9,
+      "visible": true
+    },
+    "Formulation + QC skid\n8,870 L/yr QC-released": {
+      "x": 706.2,
+      "y": 730.1,
+      "visible": true
+    },
+    "Certified control cabinet\nhazardous-area rated, ESD, SCADA": {
+      "x": 452.0,
+      "y": 721.4,
+      "visible": true
+    },
+    "Hybrid solar dryer\n~38 m2 collector, ~92% of dryer duty": {
+      "x": 584.4,
+      "y": 640.7,
+      "visible": true
+    }
+  }
+}

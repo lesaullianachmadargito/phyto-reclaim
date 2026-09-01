@@ -10,6 +10,7 @@ are computed, so if an assumption changes the outputs change with it.
 | `figure5.py` | Rebuilds Figure 5, which is missing from the submitted PDF. 300 dpi, ready for Word. |
 | `pbr_dynamic.py` | Dynamic photobioreactor simulation. Proves the Module III stage-gating claim. |
 | `rig/` | ESP32 + Node-RED bench rig. See `rig/RIG.md`. |
+| `viz3d/` | 3D model of the reference unit, generated in Blender from the paper's dimensions. |
 
 ---
 
@@ -114,6 +115,44 @@ If in doubt, use it only to answer a question, do not raise it yourself.
   judge compares the two.
 - Charts and figures are drawn without gridlines. Values are labelled directly
   instead, so nothing on screen is decoration.
+
+---
+
+## 3D model of the reference unit
+
+`viz3d/build_3d.py` builds the whole plant in Blender **procedurally, from the
+dimensions in the paper**, then renders it. Nothing is modelled by hand, so the
+model is dimensionally faithful rather than an artist's impression — it answers
+"does this actually fit on 725 m2", which is the first thing an operator asks.
+
+    "C:\Program Files\Blender Foundation\Blender 4.5lender.exe" --background --python build_3d.py
+    python annotate_3d.py
+
+Outputs land in `viz3d/renders/`:
+
+| File | View |
+|---|---|
+| `aerial_labelled.png` | Three-quarter view with leader-line callouts. Use this one. |
+| `aerial.png` | The same view, unlabelled. |
+| `plan.png` | Orthographic top-down plan. |
+| `process.png` | Close view of the 150 m2 process area. |
+| `ground.png` | Eye level, from the access road. |
+
+The layout resolves to exactly 725.0 m2: a 7.77 m process strip, then Tier 1 at
+17.88 m wide (345 m2), then Tier 2 at 11.92 m wide (230 m2), all 19.3 m deep.
+Change a number in the dimensions block and the geometry follows.
+
+### Two things it deliberately gets right
+
+**No open water.** The paper specifies a subsurface-flow wetland, so the water
+table sits inside the 0.60 m media bed and the visible surface is gravel.
+Drawing open water would depict a free-water-surface wetland — a different
+design with a different footprint and its own odour and mosquito problems. A
+judge who knows constructed wetlands would spot that immediately.
+
+**It is a visualisation, not a twin.** The model is not connected to anything and
+carries no live state. It shows what the unit would look like at the sizes
+claimed. Same naming discipline as everywhere else in this repo.
 
 ---
 
