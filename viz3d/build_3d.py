@@ -376,7 +376,8 @@ def setup_world():
     look_at(fill, (LENGTH / 2, DEPTH / 2, 1))
 
 
-def render(name, loc, target, ortho=None, res=(2400, 1350), samples=48):
+def render(name, loc, target, ortho=None, res=(2400, 1350), samples=48,
+           do_render=True):
     cam_data = bpy.data.cameras.new(name)
     cam = bpy.data.objects.new(name, cam_data)
     bpy.context.collection.objects.link(cam)
@@ -396,8 +397,11 @@ def render(name, loc, target, ortho=None, res=(2400, 1350), samples=48):
     sc.render.film_transparent = False
     sc.render.image_settings.file_format = "PNG"
     sc.render.filepath = os.path.join(OUT, name + ".png")
-    bpy.ops.render.render(write_still=True)
-    print(f"  rendered {name}.png")
+    if do_render:
+        bpy.ops.render.render(write_still=True)
+        print(f"  rendered {name}.png")
+    else:
+        print(f"  skipped {name}.png")
     return cam
 
 
@@ -414,7 +418,66 @@ def project(cam, anchors, res):
     return out
 
 
+def organise_collections():
+    """Sort objects into named collections so the outliner is navigable.
+
+    Matters only when the .blend is opened in the GUI - with ~1,000 objects a
+    flat outliner is unusable.
+    """
+    groups = {
+        "Site": ("terrain", "plot_pad", "access_road", "process_pad"),
+        "Wetland Tier 1": ("tier1",),
+        "Wetland Tier 2": ("tier2",),
+        "Process equipment": ("ec_", "adsorb", "pbr_", "centrifuge", "dryer",
+                              "water_tank", "scrubber", "heat_exch",
+                              "formulation", "control_", "store"),
+        "Piping": ("inlet", "ec_to", "ads_to", "tier1_to", "wetland_to",
+                   "side_stream", "gas_", "pbr_to", "centrifuge_to",
+                   "dryer_to"),
+        "Planting": ("clump_",),
+        "Cameras and lights": (),
+    }
+    made = {}
+    for name in groups:
+        c = bpy.data.collections.new(name)
+        bpy.context.scene.collection.children.link(c)
+        made[name] = c
+
+    for obj in list(bpy.data.objects):
+        target = None
+        if obj.type in {"CAMERA", "LIGHT"}:
+            target = "Cameras and lights"
+        else:
+            for gname, prefixes in groups.items():
+                if any(obj.name.startswith(p) for p in prefixes):
+                    target = gname
+                    break
+        if target is None:
+            target = "Process equipment"
+        for coll in list(obj.users_collection):
+            coll.objects.unlink(obj)
+        made[target].objects.link(obj)
+    # drop Blender's default empty collection so the outliner opens tidy
+    for c in list(bpy.context.scene.collection.children):
+        if c.name not in made and not c.objects and not c.children:
+            bpy.context.scene.collection.children.unlink(c)
+            bpy.data.collections.remove(c)
+    for name, c in made.items():
+        print(f"  collection {name}: {len(c.objects)} objects")
+
+
+def save_blend():
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        "phyto_reclaim.blend")
+    bpy.ops.wm.save_as_mainfile(filepath=path)
+    print(f"  saved {os.path.basename(path)}")
+    return path
+
+
 if __name__ == "__main__":
+    argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    do_render = "--no-render" not in argv
+
     print("Building PHYTO-RECLAIM reference unit")
     print(f"  plot   {LENGTH:.2f} x {DEPTH:.2f} m = {LENGTH * DEPTH:.1f} m2")
     print(f"  tier 1 {W_TIER1:.2f} m wide = {W_TIER1 * DEPTH:.0f} m2")
@@ -426,17 +489,23 @@ if __name__ == "__main__":
     print(f"  objects: {len(bpy.data.objects)}")
 
     RES = (2400, 1350)
-    cam_a = render("aerial", (-17, -29, 25), (LENGTH * 0.42, DEPTH * 0.48, 1.2), res=RES)
+    cam_a = render("aerial", (-17, -29, 25), (LENGTH * 0.42, DEPTH * 0.48, 1.2),
+                   res=RES, do_render=do_render)
     meta = {"aerial": project(cam_a, anchors, RES)}
 
     render("plan", (LENGTH / 2, DEPTH / 2, 60), (LENGTH / 2, DEPTH / 2, 0),
-           ortho=LENGTH + 5, res=(2400, 1350))
+           ortho=LENGTH + 5, res=(2400, 1350), do_render=do_render)
     render("ground", (-7.5, 25.0, 2.4), (LENGTH * 0.40, DEPTH * 0.35, 1.5),
-           res=(2400, 1100))
+           res=(2400, 1100), do_render=do_render)
     render("process", (-11.5, -9.0, 9.5), (W_PROCESS * 0.5, 8.6, 1.6),
-           res=(2000, 1400), samples=56)
+           res=(2000, 1400), samples=56, do_render=do_render)
 
     with open(os.path.join(OUT, "anchors.json"), "w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2, ensure_ascii=False)
     print("  wrote anchors.json")
+
+    # The aerial camera is the one worth landing on when the file is opened.
+    bpy.context.scene.camera = cam_a
+    organise_collections()
+    save_blend()
     print("done")

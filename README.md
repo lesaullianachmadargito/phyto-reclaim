@@ -125,8 +125,30 @@ dimensions in the paper**, then renders it. Nothing is modelled by hand, so the
 model is dimensionally faithful rather than an artist's impression — it answers
 "does this actually fit on 725 m2", which is the first thing an operator asks.
 
-    "C:\Program Files\Blender Foundation\Blender 4.5lender.exe" --background --python build_3d.py
+    blender --background --python build_3d.py     # or the full path to blender.exe
     python annotate_3d.py
+
+Add `-- --no-render` to rebuild the model without waiting on the renders.
+
+### Opening it in Blender
+
+The build also writes `viz3d/phyto_reclaim.blend` (2.7 MB). Just double-click
+it, or File -> Open. Everything is already set up:
+
+- **Units are metres.** Blender's measure tool (press N, Item tab, or the ruler
+  in the toolbar) reports real dimensions, so you can check any distance live if
+  a judge asks.
+- **Four named cameras**: `aerial`, `plan`, `ground`, `process`. Numpad 0 looks
+  through the active one. To switch, click a camera in the outliner, then
+  Ctrl+Numpad 0.
+- **Objects are grouped into collections**: Site, Wetland Tier 1, Wetland Tier 2,
+  Process equipment, Piping, Planting, Cameras and lights. Click the eye icon in
+  the outliner to hide Planting if you want to see the basins and pipework
+  underneath.
+- Orbit with middle mouse, pan with Shift + middle mouse, zoom with the wheel.
+
+To change a dimension, edit the constants at the top of `build_3d.py` and re-run
+the build - do not move geometry by hand, or the model stops matching the paper.
 
 Outputs land in `viz3d/renders/`:
 

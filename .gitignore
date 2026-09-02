@@ -3,3 +3,4 @@ __pycache__/
 rig/_nrdata/
 *.log
 qr_*.png
+*.blend1
